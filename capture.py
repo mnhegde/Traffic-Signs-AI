@@ -86,7 +86,7 @@ sounds = {
             33:'Please slow down and pay attention to other vehicles in the intersection', 
             34:'Slow down and take the respective turn', 
             35:'Slow down and take the respective turn', 
-            36:'Please continue straight ahead, 
+            36:'Please continue straight ahead', 
             37:'Please go the respective direction for yoour destination', 
             38:'Please go the respective direction for yoour destination', 
             39:'Please merge into and keep in the right lane until designated otherwise', 
@@ -115,7 +115,7 @@ def screenshot():
     path = os.path.join('inputImg', 'screenshot.png')
     #cv2.imshow("screenshot", video.read()[1])
     cv2.imwrite(path, video.read()[1])
-    classify(path, a)
+    classify(path)
     
 if __name__ == '__main__':
     # Creates camera object
