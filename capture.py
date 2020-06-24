@@ -64,11 +64,71 @@ cv2.createTrackbar("U-V", "trackbars", 243, 255, nothing)
 def classify(file_path):
     image = Image.open(file_path)
     image = image.resize((30,30))
-    image = numpy.expand_dims(image, axis=0)
-    image = numpy.array(image)
+    image = np.expand_dims(image, axis=0)
+    image = np.array(image)
     pred = model.predict_classes([image])[0]
     sign = classes[pred+1]
     print(sign)
+
+def findRed(frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    lower_red = np.array([0, 120, 70])
+    upper_red = np.array([30, 255, 255])
+    mask1 = cv2.inRange(hsv, lower_red, upper_red)
+
+    lower_red = np.array([170, 120, 70])
+    upper_red = np.array([180, 255, 255])
+    mask2 = cv2.inRange(hsv, lower_red, upper_red)
+
+    finalRedMask = mask1 + mask2
+
+    kernel = np.ones((5, 5), np.uint8)
+    finalRedMask = cv2.erode(finalRedMask, kernel)
+    cv2.imshow("maskRed", finalRedMask)
+    # Contours detection
+    contours, _ = cv2.findContours(finalRedMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    signPresent = False
+
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
+
+        if area > 1500:
+            cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
+
+            if 3 < len(approx) and len(approx) < 20:
+                signPresent = True
+
+    return signPresent
+
+def findBlue(frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    lower_blue = np.array([100,150,0], np.uint8)
+    upper_blue = np.array([140,255,255], np.uint8)
+    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+
+    kernel = np.ones((5, 5), np.uint8)
+    finalRedMask = cv2.erode(mask, kernel)
+    cv2.imshow("maskBlue", mask)
+    # Contours detection
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    signPresent = False
+
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
+
+        if area > 1500:
+            cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
+
+            if 3 < len(approx) and len(approx) < 20:
+                signPresent = True
+
+    return signPresent
 
 def screenshot():
     global video
@@ -78,9 +138,14 @@ def screenshot():
     cv2.imwrite(path, pic)
     image = cv2.imread("inputImg/screenshot.png")
 
-    signPresent = False
+    #image = cv2.imread("Road_Signs.png")
+    #width = int(image.shape[1] * 30 / 100)
+    #height = int(image.shape[0] * 30 / 100)
+    #dsize = (width, height)
+    #image = cv2.resize(image, dsize)
+    #cv2.imshow("org", image)
 
-    if signPresent:
+    if findBlue(image) or findRed(image):
         classify(path)
 
 if __name__ == '__main__':
@@ -94,8 +159,11 @@ if __name__ == '__main__':
     while True:
         # Creates a frame object
         check, frame = video.read()
-
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        #frame = cv2.imread("Road_Signs.png")
+        #width = int(frame.shape[1] * 30 / 100)
+        #height = int(frame.shape[0] * 30 / 100)
+        #dsize = (width, height)
+        #frame = cv2.resize(frame, dsize)
 
         l_h = cv2.getTrackbarPos("L-H", "trackbars")
         l_s = cv2.getTrackbarPos("L-S", "trackbars")
@@ -104,28 +172,10 @@ if __name__ == '__main__':
         u_s = cv2.getTrackbarPos("U-S", "trackbars")
         u_v = cv2.getTrackbarPos("U-V", "trackbars")
 
-        lower_red = np.array([0, 120, 70])
-        upper_red = np.array([30, 255, 255])
-        mask1 = cv2.inRange(hsv, lower_red, upper_red)
-
-        lower_red = np.array([170, 120, 70])
-        upper_red = np.array([180, 255, 255])
-        mask2 = cv2.inRange(hsv, lower_red, upper_red)
-
-        finalMask = mask1 + mask2
-        cv2.imshow("mask", finalMask)
-        # Contours detection
-        contours, _ = cv2.findContours(finalMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-        for cnt in contours:
-            cv2.drawContours(frame, [cnt], 0, (0, 0, 0), 5)
-
-
-
 
         # Show the frame
         cv2.imshow("Capturing", frame)
-        key = cv2.waitKey(1)
+        key = cv2.waitKey(750)
 
         if key == ord('q'):
             break
