@@ -15,7 +15,6 @@ if __name__ == '__main__':
 
     a = 0
     while True:
-        a += 1
         # Creates a frame object
         check, frame = video.read()
 
@@ -26,7 +25,9 @@ if __name__ == '__main__':
 
         if key == ord('q'):
             break
+
         screenshot()
+        a += 1
 
     print(a)
 
