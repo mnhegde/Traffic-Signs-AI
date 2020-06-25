@@ -12,6 +12,6 @@ def playString(string):
     playsound(filename)
     os.remove(filename)
 
-playString('Speed limit (20km/h)')
+
   
 
