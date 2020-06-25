@@ -1,6 +1,6 @@
 import cv2, time, os
 from PIL import Image
-import numpy
+import numpy as np
 from sound import playString
 from keras.models import load_model
 
@@ -105,8 +105,8 @@ def classify(file_path): # The AI function
     global previousSign
     image = Image.open(file_path)
     image = image.resize((30,30))
-    image = numpy.expand_dims(image, axis=0)
-    image = numpy.array(image)
+    image = np.expand_dims(image, axis=0)
+    image = np.array(image)
     pred = model.predict_classes([image])[0]
     sign = classes[pred+1]
     if sign != previousSign:
