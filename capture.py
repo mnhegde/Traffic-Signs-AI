@@ -52,14 +52,6 @@ classes = { 1:'Speed limit (20km/h)',
             42:'End of no passing',
             43:'End no passing veh > 3.5 tons' }
 
-cv2.namedWindow("trackbars")
-cv2.createTrackbar("L-H", "trackbars", 0, 180, nothing)
-cv2.createTrackbar("L-S", "trackbars", 185, 255, nothing)
-cv2.createTrackbar("L-V", "trackbars", 128, 255, nothing)
-cv2.createTrackbar("U-H", "trackbars", 36, 180, nothing)
-cv2.createTrackbar("U-S", "trackbars", 255, 255, nothing)
-cv2.createTrackbar("U-V", "trackbars", 243, 255, nothing)
-
 
 def classify(file_path):
     image = Image.open(file_path)
@@ -164,13 +156,6 @@ if __name__ == '__main__':
         #height = int(frame.shape[0] * 30 / 100)
         #dsize = (width, height)
         #frame = cv2.resize(frame, dsize)
-
-        l_h = cv2.getTrackbarPos("L-H", "trackbars")
-        l_s = cv2.getTrackbarPos("L-S", "trackbars")
-        l_v = cv2.getTrackbarPos("L-V", "trackbars")
-        u_h = cv2.getTrackbarPos("U-H", "trackbars")
-        u_s = cv2.getTrackbarPos("U-S", "trackbars")
-        u_v = cv2.getTrackbarPos("U-V", "trackbars")
 
 
         # Show the frame
