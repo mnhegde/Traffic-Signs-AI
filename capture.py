@@ -142,7 +142,7 @@ def findRed(frame):
         approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
 
         # if area of detected shape is too small(since it is most likelly static)
-        if area > 1500:
+        if area > 2500:
             cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
 
             # if the amount of sides is in between 3(triangle) and 20(most likelly a circle)
@@ -155,7 +155,7 @@ def findBlue(frame):
     # Finding Blue in the picture
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    lower_blue = np.array([100,150,0], np.uint8)
+    lower_blue = np.array([110,50,25], np.uint8)
     upper_blue = np.array([140,255,255], np.uint8)
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
@@ -174,7 +174,7 @@ def findBlue(frame):
         approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
 
         # if area of detected shape is too small(since it is most likelly static)
-        if area > 1500:
+        if area > 2500:
             cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
 
             # if the amount of sides is in between 3(triangle) and 20(most likelly a circle)
