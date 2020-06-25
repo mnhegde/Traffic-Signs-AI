@@ -101,7 +101,7 @@ sounds = {
 }
 
 
-def classify(file_path):
+def classify(file_path): # The AI function
     global previousSign
     image = Image.open(file_path)
     image = image.resize((30,30))
@@ -114,6 +114,7 @@ def classify(file_path):
         playString('I detected a ' + sign + ' sign. ' + sounds[pred+1])
 
 def findRed(frame):
+    # Finding Red/Orange/Light_Yellow in the picture
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     lower_red = np.array([0, 120, 70])
@@ -126,8 +127,10 @@ def findRed(frame):
 
     finalRedMask = mask1 + mask2
 
+    # Gets rid of some static in the picture
     kernel = np.ones((5, 5), np.uint8)
     finalRedMask = cv2.erode(finalRedMask, kernel)
+
     cv2.imshow("maskRed", finalRedMask)
     # Contours detection
     contours, _ = cv2.findContours(finalRedMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -138,23 +141,28 @@ def findRed(frame):
         area = cv2.contourArea(cnt)
         approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
 
+        # if area of detected shape is too small(since it is most likelly static)
         if area > 1500:
             cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
 
+            # if the amount of sides is in between 3(triangle) and 20(most likelly a circle)
             if 3 < len(approx) and len(approx) < 20:
                 signPresent = True
 
     return signPresent
 
 def findBlue(frame):
+    # Finding Blue in the picture
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     lower_blue = np.array([100,150,0], np.uint8)
     upper_blue = np.array([140,255,255], np.uint8)
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
+    # Gets rid of some static in the picture
     kernel = np.ones((5, 5), np.uint8)
     finalRedMask = cv2.erode(mask, kernel)
+
     cv2.imshow("maskBlue", mask)
     # Contours detection
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -165,9 +173,11 @@ def findBlue(frame):
         area = cv2.contourArea(cnt)
         approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
 
+        # if area of detected shape is too small(since it is most likelly static)
         if area > 1500:
             cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
 
+            # if the amount of sides is in between 3(triangle) and 20(most likelly a circle)
             if 3 < len(approx) and len(approx) < 20:
                 signPresent = True
 
@@ -176,9 +186,8 @@ def findBlue(frame):
 def screenshot():
     global video
     path = os.path.join('inputImg', 'screenshot.png')
-    pic = video.read()[1]
-    #cv2.imshow("screenshot", video.read()[1])
-    cv2.imwrite(path, pic)
+    pic = video.read()[1] # Reads the video from main.
+    cv2.imwrite(path, pic) # Puts the picture into the file_path
     image = cv2.imread("inputImg/screenshot.png")
 
     #image = cv2.imread("Road_Signs.png")
@@ -188,7 +197,7 @@ def screenshot():
     #image = cv2.resize(image, dsize)
     #cv2.imshow("org", image)
 
-    if findBlue(image) or findRed(image):
+    if findBlue(image) or findRed(image): # If we find Red / Blue in our screenshot
         classify(path)
 
 if __name__ == '__main__':
@@ -202,6 +211,7 @@ if __name__ == '__main__':
     while True:
         # Creates a frame object
         check, frame = video.read()
+
         #frame = cv2.imread("Road_Signs.png")
         #width = int(frame.shape[1] * 30 / 100)
         #height = int(frame.shape[0] * 30 / 100)
@@ -213,13 +223,14 @@ if __name__ == '__main__':
         cv2.imshow("Capturing", frame)
         key = cv2.waitKey(750)
 
+        # If the letter Q is pressed, the video stops recording.
         if key == ord('q'):
             break
 
         screenshot()
         a += 1
 
-    print(a)
+    print(a) # Num screenshots the program made
 
     # Shut down camera
     video.release()
